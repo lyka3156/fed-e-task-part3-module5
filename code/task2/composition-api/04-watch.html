@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>watch</title>
+</head>
+
+<body>
+    <div id="app">
+        <p>
+            请问一个 yes/no 的问题:
+            <input v-model="question">
+        </p>
+        <p>{{ answer }}</p>
+    </div>
+
+    <script type="module">
+
+        import { createApp, ref, watch } from './node_modules/vue/dist/vue.esm-browser.js'
+
+        createApp({
+            setup() {
+                const question = ref('')        // 问题
+                const answer = ref('')          // 答案
+                // 当问题改变就请求接口拿到问题的结果
+                watch(question, async (newValue, oldValue) => {
+                    // https://www.yesno.wtf/api  随机返回yes or no
+                    const response = await fetch('https://www.yesno.wtf/api')
+                    const data = await response.json()
+                    console.log(data);
+                    answer.value = data.answer
+                })
+                return {
+                    question,
+                    answer
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>

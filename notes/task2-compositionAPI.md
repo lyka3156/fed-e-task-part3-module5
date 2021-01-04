@@ -219,9 +219,143 @@ ref参数类型
 - toRefs可以把代理对象的所有属性都转换成响应式对象，toRefs在处理对象的属性类似于ref，通过toRefs处理reactive返回的代理对象可以进行解构的操作
 
 ## 1.5 computed
+- 简化模板中的代码，缓存计算的结果，当数据变化后才会计算。
+- 可以像vue2.0一样在组件中创建computed
+- 也可以在vue3.0的setup函数中创建computed
+
+- 第一种用法
+    - 传入获取值的函数，函数内部依赖响应式的数据，当依赖的数据发生变化之后，会重新执行该函数获取数据
+    - computed函数返回不可变的响应式对象，类似于使用ref创建的对象只有一个value属性，获取计算属性的值要通过value来获取，模板中使用计算属性可以省略value
+    ``` js
+    watch(()=>{count.value+1})
+    ```
+- 第二种用法
+    - 传入一个对象，这个对象具有get和set方法，返回一个不可变的响应式对象，当获取值的时候会触发这个get方法，当设置值的时候会触发这个对象的set方法
+    ```js
+    const count = ref(1)
+    const plusOne = computed({
+        get: ()=>count.value + 1,
+        set: val => {count.value = val-1}
+    })
+    ```
+
+- 总结：
+    - 他可以创建一个响应式的数据，这个响应式的数据依赖于其他响应式的数据，当依赖的数据发生变化后，会重新计算属性传入的函数
+``` html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>comnputed</title>
+</head>
+
+<body>
+    <div id="app">
+        <button @click="push">按钮</button>
+        未完成：{{ activeCount }}
+    </div>
+    <script type="module">
+        import { createApp, reactive, computed } from './node_modules/vue/dist/vue.esm-browser.js'
+        const data = [
+            { text: '看书', completed: false },
+            { text: '敲代码', completed: false },
+            { text: '约会', completed: true }
+        ]
+
+        createApp({
+            // composition API 在这里面写
+            setup() {
+                // todos响应式对象 proxy对象
+                const todos = reactive(data)
+
+                // 未完成的代办事项个数
+                const activeCount = computed(() => {
+                    return todos.filter(item => !item.completed).length
+                })
+
+                return {
+                    activeCount,
+                    push: () => {
+                        todos.push({
+                            text: '吃饭了',
+                            completed: false    // 未完成
+                        })
+                    }
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
+```
 
 ## 1.6 watch
+- 和之前$watch和options API中的watch是一样的
+- 监听响应式数据的变化，然后执行一个回调函数，最后只要监听数据的新值和旧值
+
+- watch的三个参数
+    - 第一个参数：要监听的数据
+        - 可以是一个获取值的函数,监听这个函数返回值的变化
+        - 或者可以是一个ref或者reactive返回的对象，还可以是数组
+    - 第二个参数：监听到数据变化后执行的函数，这个函数有两个参数分别是新值和旧值
+    - 第三个参数：选项对象，deep(深度监听)和immediate(立即执行)
+
+- watch的返回值
+    - 取消监听的函数
+``` html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>watch</title>
+</head>
+
+<body>
+    <div id="app">
+        <p>
+            请问一个 yes/no 的问题:
+            <input v-model="question">
+        </p>
+        <p>{{ answer }}</p>
+    </div>
+
+    <script type="module">
+
+        import { createApp, ref, watch } from './node_modules/vue/dist/vue.esm-browser.js'
+
+        createApp({
+            setup() {
+                const question = ref('')        // 问题
+                const answer = ref('')          // 答案
+                // 当问题改变就请求接口拿到问题的结果
+                watch(question, async (newValue, oldValue) => {
+                    // https://www.yesno.wtf/api  随机返回yes or no
+                    const response = await fetch('https://www.yesno.wtf/api')
+                    const data = await response.json()
+                    console.log(data);
+                    answer.value = data.answer
+                })
+                return {
+                    question,
+                    answer
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
+```
 
 ## 1.7 watchEffect
+- 是watch函数的简化版本，也用来监视数据的变化
+- watchEffect和watch的区别是，没有第二个回调函数的参数
+- 接受一个函数作为参数，监听函数内响应式数据的变化，他会立即执行这个函数(类似watch开启和immediate)，当数据变化会重新运行该函数
+- 他返回一个取消监听的函数
+
 
 ## 1.8 案列-实现代办事项增删改，切换，存储等功能
