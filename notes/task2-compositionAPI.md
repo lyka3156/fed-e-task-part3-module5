@@ -142,7 +142,7 @@ onRenderTracked和onRederTriggered这两个钩子非常相似，都是在render�
 
 ## 1.4 reactive-toRefs-ref
 ### 1.4.1 reactive
-- 无法对reactive包装的响应式对象无法进行解构，解构之后的属性不是响应式数据
+- 无法对reactive包装的响应式对象进行解构，解构之后的属性不是响应式数据
 - 如果需要解构就使用toRefs来设置响应式数据
 ``` js
 import { createApp, reactive} from "./node_modules/vue/dist/vue.esm-browser.js"
