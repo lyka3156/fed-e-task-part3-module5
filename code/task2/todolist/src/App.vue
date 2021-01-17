@@ -191,10 +191,10 @@ const useFilter = (todos) => {
   });
 
   return {
-    allDone,
-    count,
-    filteredTodos,
-    remainingCount,
+    allDone, // 代办事项是否全部完成
+    count, // 代办事项总数量
+    filteredTodos, // 根据类型过滤代办事项
+    remainingCount, // 未完成代办事项个数
   };
 };
 
