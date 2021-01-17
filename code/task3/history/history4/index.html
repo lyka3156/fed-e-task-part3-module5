@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 Composition API 原理实现测试: toRefs</title>
+</head>
+
+<body>
+    <script type="module">
+        // import { reactive, effect } from "./node_modules/@vue/reactivity/dist/reactivity.esm-browser.js"
+        import { reactive, effect, toRefs } from "./reactivity/index.js"
+
+        function useProduct() {
+            // 创建响应式对象product
+            const product = reactive({
+                name: 'iPhone',
+                price: 5000,
+                count: 3
+            });
+            // 将reactive返回的响应式对象通过toRefs包装之后可以解构
+            return toRefs(product);
+        }
+
+        const { price, count } = useProduct();
+
+        let total = 0
+        // effect和watchEffect一样，watchEffect内部是调用effect实现的
+        // effect初始化会执行一次，当这个函数引用响应式数据的时候，
+        // 如果引用的响应式发送变化会再次执行
+        effect(() => {
+            total = price.value * count.value
+        })
+
+        console.log(total)          // 15000
+
+        price.value = 4000
+        console.log(total)          // 12000
+
+        count.value = 1
+        console.log(total)          // 4000
+    </script>
+</body>
+
+</html>

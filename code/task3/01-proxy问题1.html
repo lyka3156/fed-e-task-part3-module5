@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy问题1</title>
+</head>
+
+<body>
+    <script>
+        'use strict'
+        // 问题1： set 和 deleteProperty 中需要返回布尔类型的值
+        //        在严格模式下，如果返回 false 的话会出现 Type Error 的异常
+        const target = {
+            foo: 'xxx',
+            bar: 'yyy'
+        }
+        // Reflect.getPrototypeOf()
+        // Object.getPrototypeOf()
+        const proxy = new Proxy(target, {
+            // receiver: 当前访问或者继承的proxy对象
+            get(target, key, receiver) {
+                // return target[key]
+                // 严格模式下必须返回布尔类型的值
+                return Reflect.get(target, key, receiver)
+            },
+            set(target, key, value, receiver) {
+                // target[key] = value
+                // 严格模式下必须返回布尔类型的值
+                return Reflect.set(target, key, value, receiver)
+            },
+            deleteProperty(target, key) {
+                // delete target[key]
+                return Reflect.deleteProperty(target, key)
+            }
+        })
+
+        proxy.foo = 'zzz'
+        // delete proxy.foo
+    </script>
+</body>
+
+</html>

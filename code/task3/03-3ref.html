@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 Composition API 原理实现测试: computed</title>
+</head>
+
+<body>
+    <script type="module">
+        import { reactive, toRefs, computed } from "./reactivity/index.js"
+
+        function useProduct() {
+            // 创建响应式对象product
+            const product = reactive({
+                name: 'iPhone',
+                price: 5000,
+                count: 3
+            });
+            // 将reactive返回的响应式对象通过toRefs包装之后可以解构
+            return toRefs(product);
+        }
+
+        const { price, count } = useProduct();
+
+        let total = computed(() => price.value * count.value);
+
+
+        console.log(total.value)          // 15000
+
+        price.value = 4000
+        console.log(total.value)           // 12000
+
+        count.value = 1
+        console.log(total.value)           // 4000
+    </script>
+</body>
+
+</html>

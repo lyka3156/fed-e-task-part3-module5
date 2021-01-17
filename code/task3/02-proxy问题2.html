@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy问题2</title>
+</head>
+
+<body>
+    <script>
+        'use strict'
+        // 问题2：Proxy 和 Reflect 中使用的 receiver
+
+        // Proxy 中 receiver：Proxy 或者继承 Proxy 的对象
+        // Reflect 中 receiver：如果 target 对象中设置了 getter，getter 中的 this 指向 receiver
+
+        const obj = {
+            get foo() {
+                // reflect中设置了receiver，那么此处就指向receiver代理对象，否则就是当前对象本身
+                console.log(this)
+                return this.bar
+            }
+        }
+
+        const proxy = new Proxy(obj, {
+            // 当前访问的 Proxy 或者继承 Proxy 的对象
+            get(target, key, receiver) {
+                if (key === 'bar') {
+                    return 'value - bar'
+                }
+                // 如果这里设置了receiver，将来访问target对象的get属性时，this指向receiver代理对象
+                return Reflect.get(target, key, receiver)
+            }
+        })
+        console.log(proxy.foo)
+    </script>
+</body>
+
+</html>

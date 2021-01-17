@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue3 Composition API 原理实现测试: reactive</title>
+</head>
+
+<body>
+    <script type="module">
+        import { reactive } from "./reactivity/index.js"
+        const obj = reactive({
+            name: "lisi",
+            age: 26
+        })
+
+        obj.age;
+        obj.age = 20;
+        delete obj.age
+        console.log(obj)
+    </script>
+</body>
+
+</html>
